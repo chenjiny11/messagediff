@@ -76,6 +76,19 @@ func (d *Diff) diff(aVal, bVal reflect.Value, path Path, opts *opts) bool {
 		d.Modified[&localPath] = Update{Old: aVal.Interface(), New: bVal.Interface()}
 		return false
 	}
+	
+	//  for support: time.Time 
+	if aVal.Type() == reflect.TypeOf(time.Time{}) {
+		aTime := aVal.Interface().(time.Time)
+		bTime := bVal.Interface().(time.Time)
+
+		if aTime.Equal(bTime) {
+			return true
+		}
+
+		d.Modified[&localPath] = bTime
+		return false
+	}
 	kind := aVal.Kind()
 
 	// Borrowed from the reflect package to handle recursive data structures.
